@@ -1,0 +1,427 @@
+{
+  "project_id": "notifications",
+  "project": {
+    "id": "notifications",
+    "name": "notifications",
+    "slug": "notifications",
+    "commit": "a0c45590f4563637864aad5308ebce60d6646966"
+  },
+  "pages": [
+    {
+      "slug": "capabilities-email",
+      "title": "Email",
+      "description": "Render a template and deliver it as an email via SendGrid.",
+      "confidence": {
+        "documented": 100,
+        "verified": "unreviewed",
+        "tested": 0,
+        "debt": {
+          "count": 1,
+          "high": 1
+        }
+      },
+      "built_from": [
+        {
+          "symbol": "EmailChannel.send()",
+          "kind": "method",
+          "doc": "documented",
+          "coverage": null,
+          "debt": "high",
+          "attest": "unattested",
+          "file": "examples/notifications/src/notify/EmailChannel.ts",
+          "line": 15
+        },
+        {
+          "symbol": "EmailChannel",
+          "kind": "class",
+          "doc": "gap",
+          "coverage": null,
+          "debt": null,
+          "file": "examples/notifications/src/notify/EmailChannel.ts",
+          "line": 6
+        },
+        {
+          "symbol": "mail.sgSend()",
+          "kind": "external",
+          "doc": "unknown",
+          "coverage": null,
+          "debt": null
+        }
+      ],
+      "reuses": [
+        "EmailChannel.sgSend()",
+        "PushChannel.send()",
+        "render() (reused in 3 places)"
+      ],
+      "reused_by": [
+        {
+          "name": "PushChannel.send() (shares send)",
+          "blast_radius": true
+        },
+        {
+          "name": "SmsChannel.send() (shares send)",
+          "blast_radius": true
+        }
+      ],
+      "gaps": [
+        {
+          "id": "gap-emailchannel-undocumented",
+          "kind": "undocumented",
+          "label": "EmailChannel is public but undocumented.",
+          "action": "Annotate",
+          "file": "examples/notifications/src/notify/EmailChannel.ts",
+          "line": 6
+        },
+        {
+          "id": "gap-mail-sgsend-external",
+          "kind": "unknown-external",
+          "label": "mail.sgSend() lives in another repo, unknown/unverifiable.",
+          "action": "Connect that repo"
+        }
+      ],
+      "insights": [
+        {
+          "id": "ins-render-load-bearing",
+          "kind": "invariant",
+          "title": "Rounding is load-bearing",
+          "statement": "Changing the rounding mode shifts credited amounts at scale. Keep banker's rounding or carry a linked decision.",
+          "evidence": [
+            "render is reused by 3 call sites across Email, Push, SMS, Templating",
+            "its result flows into amount and credit fields",
+            "Decision TPL-007: one renderer for every channel so escaping rules live in one place"
+          ]
+        }
+      ],
+      "todos": [
+        {
+          "id": "todo-ac2f398e01cfd091",
+          "priority": "med",
+          "text": "handle hard bounces and unsubscribe webhooks",
+          "symbol": "EmailChannel.send",
+          "file": "examples/notifications/src/notify/EmailChannel.ts",
+          "line": 15
+        }
+      ],
+      "debt": [
+        {
+          "id": "debt-37c0afc4a2f0b27c",
+          "severity": "debt",
+          "impact": "high",
+          "likelihood": "med",
+          "risk": "high",
+          "reason": "retry/backoff is hard-coded to 3 tries; should use the shared RetryPolicy",
+          "ticket": "NOTIF-88",
+          "symbol": "EmailChannel.send",
+          "file": "examples/notifications/src/notify/EmailChannel.ts",
+          "line": 15
+        }
+      ],
+      "decisions": [],
+      "invariants": []
+    },
+    {
+      "slug": "capabilities-push",
+      "title": "Push",
+      "description": "Render a template and deliver it as a mobile push.",
+      "confidence": {
+        "documented": 100,
+        "verified": "unreviewed",
+        "tested": 0,
+        "debt": {
+          "count": 0,
+          "high": 0
+        }
+      },
+      "built_from": [
+        {
+          "symbol": "PushChannel.send()",
+          "kind": "method",
+          "doc": "documented",
+          "coverage": null,
+          "debt": null,
+          "attest": "unattested",
+          "file": "examples/notifications/src/notify/PushChannel.ts",
+          "line": 11
+        }
+      ],
+      "reuses": [
+        "EmailChannel.send() (reused in 2 places)",
+        "render() (reused in 3 places)"
+      ],
+      "reused_by": [
+        {
+          "name": "EmailChannel.send() (shares send)",
+          "blast_radius": true
+        }
+      ],
+      "gaps": [],
+      "insights": [
+        {
+          "id": "ins-render-load-bearing",
+          "kind": "invariant",
+          "title": "Rounding is load-bearing",
+          "statement": "Changing the rounding mode shifts credited amounts at scale. Keep banker's rounding or carry a linked decision.",
+          "evidence": [
+            "render is reused by 3 call sites across Email, Push, SMS, Templating",
+            "its result flows into amount and credit fields",
+            "Decision TPL-007: one renderer for every channel so escaping rules live in one place"
+          ]
+        }
+      ],
+      "todos": [
+        {
+          "id": "todo-6b132226e195e6dd",
+          "priority": "low",
+          "text": "support web push (VAPID) in addition to mobile",
+          "symbol": "PushChannel.send",
+          "file": "examples/notifications/src/notify/PushChannel.ts",
+          "line": 11
+        }
+      ],
+      "debt": [
+        {
+          "id": "debt-706d75c648f7031b",
+          "severity": "cleanup",
+          "impact": null,
+          "likelihood": null,
+          "risk": "low",
+          "reason": "Old A/B feature-flag branch that is always false now - remove it.",
+          "ticket": null,
+          "symbol": "PushChannel.send",
+          "file": "examples/notifications/src/notify/PushChannel.ts",
+          "line": 11
+        }
+      ],
+      "decisions": [],
+      "invariants": []
+    },
+    {
+      "slug": "capabilities-sms",
+      "title": "SMS",
+      "description": "Render a template and deliver it as an SMS via Twilio.",
+      "confidence": {
+        "documented": 100,
+        "verified": "unreviewed",
+        "tested": 0,
+        "debt": {
+          "count": 1,
+          "high": 0
+        }
+      },
+      "built_from": [
+        {
+          "symbol": "SmsChannel.send()",
+          "kind": "method",
+          "doc": "documented",
+          "coverage": null,
+          "debt": "med",
+          "attest": "unattested",
+          "file": "examples/notifications/src/notify/SmsChannel.ts",
+          "line": 14
+        },
+        {
+          "symbol": "SmsChannel",
+          "kind": "class",
+          "doc": "gap",
+          "coverage": null,
+          "debt": null,
+          "file": "examples/notifications/src/notify/SmsChannel.ts",
+          "line": 5
+        },
+        {
+          "symbol": "twilio.messages()",
+          "kind": "external",
+          "doc": "unknown",
+          "coverage": null,
+          "debt": null
+        }
+      ],
+      "reuses": [
+        "EmailChannel.send() (reused in 2 places)",
+        "SmsChannel.messages()",
+        "render() (reused in 3 places)"
+      ],
+      "reused_by": [],
+      "gaps": [
+        {
+          "id": "gap-smschannel-undocumented",
+          "kind": "undocumented",
+          "label": "SmsChannel is public but undocumented.",
+          "action": "Annotate",
+          "file": "examples/notifications/src/notify/SmsChannel.ts",
+          "line": 5
+        },
+        {
+          "id": "gap-twilio-messages-external",
+          "kind": "unknown-external",
+          "label": "twilio.messages() lives in another repo, unknown/unverifiable.",
+          "action": "Connect that repo"
+        }
+      ],
+      "insights": [
+        {
+          "id": "ins-render-load-bearing",
+          "kind": "invariant",
+          "title": "Rounding is load-bearing",
+          "statement": "Changing the rounding mode shifts credited amounts at scale. Keep banker's rounding or carry a linked decision.",
+          "evidence": [
+            "render is reused by 3 call sites across Email, Push, SMS, Templating",
+            "its result flows into amount and credit fields",
+            "Decision TPL-007: one renderer for every channel so escaping rules live in one place"
+          ]
+        }
+      ],
+      "todos": [],
+      "debt": [
+        {
+          "id": "debt-664d227082abb890",
+          "severity": "debt",
+          "impact": "med",
+          "likelihood": "high",
+          "risk": "high",
+          "reason": "no per-recipient rate limiting; a loop can fan out and rack up spend",
+          "ticket": "NOTIF-90",
+          "symbol": "SmsChannel.send",
+          "file": "examples/notifications/src/notify/SmsChannel.ts",
+          "line": 14
+        },
+        {
+          "id": "debt-45a3c860eb5ddc96",
+          "severity": "cleanup",
+          "impact": null,
+          "likelihood": null,
+          "risk": "low",
+          "reason": "Legacy GSM-7 unicode workaround, dead since Twilio handles it now - delete it.",
+          "ticket": null,
+          "symbol": "SmsChannel.send",
+          "file": "examples/notifications/src/notify/SmsChannel.ts",
+          "line": 14
+        }
+      ],
+      "decisions": [],
+      "invariants": []
+    },
+    {
+      "slug": "capabilities-templating",
+      "title": "Templating",
+      "description": "Escape a value for safe interpolation.",
+      "confidence": {
+        "documented": 100,
+        "verified": "unreviewed",
+        "tested": 0,
+        "debt": {
+          "count": 0,
+          "high": 0
+        }
+      },
+      "built_from": [
+        {
+          "symbol": "escape()",
+          "kind": "method",
+          "doc": "documented",
+          "coverage": null,
+          "debt": null,
+          "attest": "unattested",
+          "file": "examples/notifications/src/notify/Templates.ts",
+          "line": 17
+        },
+        {
+          "symbol": "render()",
+          "kind": "method",
+          "doc": "documented",
+          "coverage": null,
+          "debt": null,
+          "attest": "unattested",
+          "file": "examples/notifications/src/notify/Templates.ts",
+          "line": 9
+        }
+      ],
+      "reuses": [
+        "escape()"
+      ],
+      "reused_by": [
+        {
+          "name": "EmailChannel.send() (shares render)",
+          "blast_radius": true
+        },
+        {
+          "name": "PushChannel.send() (shares render)",
+          "blast_radius": true
+        },
+        {
+          "name": "SmsChannel.send() (shares render)",
+          "blast_radius": true
+        }
+      ],
+      "gaps": [],
+      "insights": [
+        {
+          "id": "ins-render-load-bearing",
+          "kind": "invariant",
+          "title": "Rounding is load-bearing",
+          "statement": "Changing the rounding mode shifts credited amounts at scale. Keep banker's rounding or carry a linked decision.",
+          "evidence": [
+            "render is reused by 3 call sites across Email, Push, SMS, Templating",
+            "its result flows into amount and credit fields",
+            "Decision TPL-007: one renderer for every channel so escaping rules live in one place"
+          ]
+        }
+      ],
+      "todos": [],
+      "debt": [],
+      "decisions": [
+        {
+          "id": "decision-tpl-007",
+          "reference": "TPL-007",
+          "why": "one renderer for every channel so escaping rules live in one place",
+          "symbol": "render",
+          "file": "examples/notifications/src/notify/Templates.ts",
+          "line": 9,
+          "status": "active",
+          "supersedes": null,
+          "superseded_by": null
+        }
+      ],
+      "invariants": [
+        {
+          "id": "invariant-01b1b89a141449cf",
+          "rule": "All interpolated values are HTML/text escaped. A template must never emit raw user input - that is how a notification becomes an injection.",
+          "symbol": "render",
+          "file": "examples/notifications/src/notify/Templates.ts",
+          "line": 9
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "symbols": 10,
+    "documented_pct": 50,
+    "tested_pct": 0,
+    "open_debt": 2,
+    "high_debt": 1,
+    "open_todos": 2,
+    "todos_high": 0,
+    "attested_pct": 0,
+    "drift": {
+      "stale": 0,
+      "unverified": 0,
+      "unattested": 5
+    },
+    "gaps_by_kind": {
+      "undocumented": 2,
+      "untested": 0,
+      "unknown_external": 2,
+      "missing_why": 0
+    },
+    "top_insights": [
+      "Rounding is load-bearing: Changing the rounding mode shifts credited amounts at scale. Keep banker's rounding or carry a linked decision."
+    ],
+    "budget": {
+      "high_debt": 1,
+      "open_debt": 6,
+      "over": false,
+      "breaches": []
+    }
+  },
+  "pending_accounting": []
+}

@@ -1,0 +1,14 @@
+# DockyDoo project config for the notifications example.
+#
+# Theme: a SHIPPABLE project that still carries real, tracked debt. The budget
+# is set generously so the gate passes, but the Tech debt and To do registers
+# are full - this is what "managing debt honestly" looks like.
+archetype: api-backend
+source:
+  include:
+    - "src/**/*.ts"
+  exclude:
+    - "**/*.test.ts"
+budget:
+  high_debt: 1
+  open_debt: 6
